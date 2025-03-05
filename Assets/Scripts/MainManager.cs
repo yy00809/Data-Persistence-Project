@@ -11,12 +11,14 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text bestScoreText;
     public GameObject GameOverText;
     
     private bool m_Started = false;
     private int m_Points;
     
     private bool m_GameOver = false;
+
 
     
     // Start is called before the first frame update
@@ -36,10 +38,16 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+
+        AddPoint(0);
+        DisplayHighestScore();
     }
+
+
 
     private void Update()
     {
+       
         if (!m_Started)
         {
             if (Input.GetKeyDown(KeyCode.Space))
@@ -57,20 +65,45 @@ public class MainManager : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                StarterMenu.Instance.LoadScore();
+                SceneManager.LoadScene(1);
+               
             }
+           
         }
+    }
+
+    void DisplayHighestScore()
+    {
+        if (StarterMenu.Instance.bestPlayerName != null && StarterMenu.Instance.bestScore > StarterMenu.Instance.playerScore)
+        {
+            bestScoreText.text = "Best Score : " + StarterMenu.Instance.bestPlayerName +
+                                   " : " + StarterMenu.Instance.bestScore;
+        }
+        if (StarterMenu.Instance.bestPlayerName != null && StarterMenu.Instance.bestScore <= StarterMenu.Instance.playerScore)
+        {
+            bestScoreText.text = "Best Score : " + StarterMenu.Instance.playerName +
+                                   " : " + StarterMenu.Instance.playerScore;
+        }
+
     }
 
     void AddPoint(int point)
     {
         m_Points += point;
-        ScoreText.text = $"Score : {m_Points}";
+        ScoreText.text = "Score: " + StarterMenu.Instance.playerName + ": " + m_Points;
+        StarterMenu.Instance.playerScore = m_Points;
+        DisplayHighestScore();
     }
+
 
     public void GameOver()
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+        StarterMenu.Instance.SaveScore();
     }
+
+
+    
 }
